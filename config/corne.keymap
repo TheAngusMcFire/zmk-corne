@@ -68,7 +68,7 @@
           &trans &kp Q      &kp W      &kp E      &kp R      &kp T          &td0      &kp U      &kp I      &kp O      &kp P &trans
         //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
         //│  A       │  S       │  D       │  F       │  G       │   │  H       │  J       │  K       │  L       │ ; :      │
-          &trans &hts LSHFT A &hta LALT S &ht LCTRL D &ht LGUI F  &kp G       &kp H     &ht RGUI J &ht RCTRL K  &hta RALT L  &hts RSHFT SEMI &trans
+          &kp LSHFT &kp A &hta LALT S &ht LCTRL D &ht LGUI F  &kp G       &kp H     &ht RGUI J &ht RCTRL K  &hta RALT L  &kp SEMI &kp RSHFT
         //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
         //│  Z       │  X       │  C       │  V       │  B       │   │  N       │  M       │ , <      │ . >      │ / ?      │
           &trans &kp Z      &kp X      &kp C      &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH &trans
