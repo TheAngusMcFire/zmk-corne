@@ -82,6 +82,10 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4)    RC(2,5) RC(2,6) RC(2,7) RC(2,8) RC(2,
     };
 };
 
+&reg0 {
+    status = "okay";
+};
+
 &reg1 {
     regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
 };
@@ -108,14 +112,15 @@ zephyr_udc0: &usbd {
 
 &flash0 {
     /*
-     * Buttercorne flash layout:
-     *   0x00000000 - 0x00000FFF  Nordic MBR (4 KB) — sets up interrupt forwarding
-     *   0x00001000 - 0x000EBFFF  ZMK application code  (~940 KB)
-     *   0x000EC000 - 0x000F3FFF  NVS settings storage   (32 KB)
+     * Buttercorne flash layout (Adafruit nRF52 bootloader, app at 0x1000):
+     *   0x00000000 - 0x00000FFF  Nordic MBR (4 KB)
+     *   0x00001000 - 0x000EBFFF  ZMK application code (~940 KB)
+     *   0x000EC000 - 0x000F3FFF  NVS settings storage (32 KB)
      *   0x000F4000 - 0x000FFFFF  Adafruit DFU bootloader (48 KB)
      *
-     * The RMK firmware for this board links at 0x1000 (memory.x: ORIGIN = 0x1000),
-     * confirming the bootloader jumps to 0x1000, NOT 0x26000 as on nice!nano.
+     * NOTE: The bootloader on this board jumps to 0x1000 (confirmed via RMK
+     * firmware memory.x: ORIGIN = 0x1000). XIAO's stock bootloader uses 0x27000
+     * — if the bootloader is ever replaced, this partition table must change.
      */
     partitions {
         compatible = "fixed-partitions";

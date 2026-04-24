@@ -2,6 +2,7 @@
 
 # ARM MPU and pinctrl (required by nRF52840 Zephyr SoC driver)
 CONFIG_ARM_MPU=y
+CONFIG_HW_STACK_PROTECTION=y
 CONFIG_PINCTRL=y
 
 # GPIO
@@ -11,8 +12,22 @@ CONFIG_GPIO=y
 # Equivalent to embassy-nrf's "nfc-pins-as-gpio" feature used by the RMK firmware.
 CONFIG_NFCT_PINS_AS_GPIOS=y
 
-# Place firmware at code_partition (0x26000) for Adafruit bootloader compatibility
+# Place firmware at code_partition for bootloader compatibility
 CONFIG_USE_DT_CODE_PARTITION=y
 
 # Generate .uf2 output for drag-and-drop flashing via Adafruit bootloader
 CONFIG_BUILD_OUTPUT_UF2=y
+
+# Flash + NVS settings storage (required for ZMK BLE bond persistence)
+CONFIG_MPU_ALLOW_FLASH_WRITE=y
+CONFIG_FLASH=y
+CONFIG_FLASH_PAGE_LAYOUT=y
+CONFIG_FLASH_MAP=y
+CONFIG_NVS=y
+CONFIG_SETTINGS_NVS=y
+
+# Bootloader mode entry via double-tap reset (Adafruit nRF52 bootloader)
+CONFIG_RETAINED_MEM=y
+CONFIG_RETENTION=y
+CONFIG_RETENTION_BOOT_MODE=y
+CONFIG_ZMK_BOOTMODE_MAGIC_VALUE_BOOTLOADER_TYPE_ADAFRUIT_NRF52=y
