@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: MIT
 
+# Mark this board as ZMK-compatible (required since Zephyr 4.1 / ZMK board-variant system)
+CONFIG_ZMK_BOARD_COMPAT=y
+
 # ARM MPU and pinctrl (required by nRF52840 Zephyr SoC driver)
 CONFIG_ARM_MPU=y
 CONFIG_PINCTRL=y

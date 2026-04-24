@@ -19,11 +19,11 @@
 ---
 include:
   # Corne (split, nice!nano v2)
-  - board: nice_nano
+  - board: nice_nano/zmk
     shield: corne_left
-  - board: nice_nano
+  - board: nice_nano/zmk
     shield: corne_right
-  - board: nice_nano
+  - board: nice_nano/zmk
     shield: settings_reset
 
   # Buttercorne (single board, custom nRF52840, 5 cols × 3 rows + 3 thumb keys per side)
