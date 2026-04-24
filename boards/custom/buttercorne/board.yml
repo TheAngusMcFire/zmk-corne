@@ -1,0 +1,5 @@
+board:
+  name: buttercorne
+  vendor: custom
+  socs:
+    - name: nrf52840

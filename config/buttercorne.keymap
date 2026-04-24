@@ -1,0 +1,159 @@
+/*
+ * Buttercorne keymap — 36 keys (5 cols × 3 rows per half + 3 thumb keys per side)
+ *
+ * Derived from corne.keymap: identical behaviors and layer logic, outer pinky
+ * column (the &trans / shift column) removed since the Buttercorne has no 6th
+ * column. Shift is covered by the dedicated thumb Shift keys.
+ *
+ * Layer order:
+ *   0 Default  — QWERTY + home-row mods
+ *   1 Numbers  — numbers row + navigation (hold Backspace)
+ *   2 Symbols  — symbols (hold Tab)
+ *   3 Function — F-keys + Bluetooth (tri-layer: hold both 1 and 2)
+ *   4 Gaming   — WASD layer (toggle from layer 1)
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+
+&lt {
+    flavor = "hold-preferred";
+    quick-tap-ms = <0>;
+    tapping-term-ms = <240>;
+};
+
+/ {
+    behaviors {
+        ht: hold_tap {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <150>;
+            quick-tap-ms = <0>;
+            bindings = <&kp>, <&kp>;
+        };
+        hta: hold_tap_alt {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <240>;
+            quick-tap-ms = <0>;
+            bindings = <&kp>, <&kp>;
+        };
+        hts: hold_tap_shift {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <400>;
+            bindings = <&kp>, <&kp>;
+            require-prior-idle-ms = <100>;
+        };
+        td0: tap_dance_0 {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <160>;
+            bindings = <&kp Y>, <&kp ESC>;
+        };
+    };
+
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        tri_layer {
+            if-layers = <1 2>;
+            then-layer = <3>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            bindings = <
+        //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+        //│  Q       │  W       │  E       │  R       │  T       │   │  Y, ESC  │  U       │  I       │  O       │  P       │
+          &kp Q      &kp W      &kp E      &kp R      &kp T          &td0       &kp U      &kp I      &kp O      &kp P
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│  A       │ S/LAlt   │ D/LCtrl  │ F/LGui   │  G       │   │  H       │ J/RGui   │ K/RCtrl  │ L/RAlt   │  ; :     │
+          &kp A  &hta LALT S  &ht LCTRL D  &ht LGUI F  &kp G          &kp H  &ht RGUI J  &ht RCTRL K  &hta RALT L  &kp SEMI
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│  Z       │  X       │  C       │  V       │  B       │   │  N       │  M       │  , <     │  . >     │  / ?     │
+          &kp Z      &kp X      &kp C      &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH
+        //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+        //                                 │  LShift  │ LT2/Tab  │   │  Space   │  Enter   │ LT1/Bspc │  RShift  │
+                                   &kp LSHFT  &lt 2 TAB  &kp SPACE      &kp ENTER  &lt 1 BSPC  &kp RSHFT
+        //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+
+        right_layer {
+            bindings = <
+        //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+        //│  1       │  2       │  3       │  4       │  5       │   │  6       │  7       │  8       │  9       │  0       │
+          &kp N1     &kp N2     &kp N3     &kp N4     &kp N5         &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│          │          │          │          │ CapsWord │   │  LEFT    │  DOWN    │  UP      │  RIGHT   │          │
+          &trans     &trans     &trans     &trans     &caps_word     &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT  &trans
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│          │          │          │          │          │   │  Home    │  PgDn    │  PgUp    │  End     │ Gaming   │
+          &trans     &trans     &trans     &trans     &trans         &kp HOME   &kp PG_DN  &kp PG_UP  &kp END    &tog 4
+        //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                                            &trans     &trans         &kp ESC    &trans     &trans     &trans
+        //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+
+        left_layer {
+            bindings = <
+        //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+        //│  !       │  @       │  #       │  $       │  %       │   │  ^       │  &       │  *       │  (       │  )       │
+          &kp EXCL   &kp AT     &kp HASH   &kp DLLR   &kp PRCNT      &kp CARET  &kp AMPS   &kp STAR   &kp LPAR   &kp RPAR
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│          │          │          │  "       │  '       │   │  -       │  =       │  [       │  ]       │  \       │
+          &trans     &trans     &trans     &kp DQT    &kp SQT        &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT   &kp BSLH
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│          │          │          │  `       │  ~       │   │  _       │  +       │  {       │  }       │  |       │
+          &trans     &trans     &trans     &kp GRAVE  &kp TILDE      &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC   &kp PIPE
+        //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                                            &trans     &trans         &trans     &trans     &trans     &trans
+        //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+
+        tri_layer {
+            bindings = <
+        //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+        //│  F1      │  F2      │  F3      │  F4      │  F5      │   │  F6      │  F7      │  F8      │  F9      │  F10     │
+          &kp F1     &kp F2     &kp F3     &kp F4     &kp F5         &kp F6     &kp F7     &kp F8     &kp F9     &kp F10
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│  F11     │  F12     │          │          │          │   │ BT SEL 0 │ BT SEL 1 │ BT SEL 2 │ BT SEL 3 │ BT SEL 4 │
+          &kp F11    &kp F12    &trans     &trans     &trans         &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│  RESET   │  BOOT    │          │          │ CLEAR BT │   │          │          │          │  BOOT    │  RESET   │
+          &sys_reset &bootloader &trans    &trans     &bt BT_CLR     &trans     &trans     &trans     &bootloader &sys_reset
+        //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                                            &trans     &trans         &trans     &trans     &trans     &trans
+        //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+
+        gaming_layer {
+            bindings = <
+        //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+        //│  Tab     │  Q       │  W       │  E       │  R       │   │          │          │          │          │          │
+          &kp TAB    &kp Q      &kp W      &kp E      &kp R          &trans     &trans     &trans     &trans     &trans
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│  LShift  │  A       │  S       │  D       │  F       │   │          │          │          │          │          │
+          &kp LSHIFT &kp A      &kp S      &kp D      &kp F          &trans     &trans     &trans     &trans     &trans
+        //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+        //│  LCtrl   │  Z       │  X       │  C       │  V       │   │          │          │          │          │          │
+          &kp LCTRL  &kp Z      &kp X      &kp C      &kp V          &trans     &trans     &trans     &trans     &trans
+        //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                                            &trans     &trans         &trans     &trans     &trans     &trans
+        //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+    };
+};

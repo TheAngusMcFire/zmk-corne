@@ -1,0 +1,139 @@
+/*
+ * Buttercorne — custom nRF52840 keyboard (4 rows × 10 cols, single board)
+ *
+ * Matrix pin assignments from RMK firmware (src/main.rs):
+ *   Row 0 → P0.02   Row 1 → P0.29   Row 2 → P0.09   Row 3 → P0.04
+ *   Col 0 → P1.01   Col 1 → P0.28   Col 2 → P0.19   Col 3 → P0.03   Col 4 → P0.15
+ *   Col 5 → P0.05   Col 6 → P1.11   Col 7 → P1.03   Col 8 → P1.05   Col 9 → P1.07
+ *
+ * Diode direction: col2row (columns driven HIGH, rows sensed with pull-down)
+ *
+ * Flash layout matches the Adafruit nRF52 bootloader (code at 0x26000),
+ * same as nice!nano — produces a .uf2 that can be drag-dropped.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/dts-v1/;
+
+#include <nordic/nrf52840_qiaa.dtsi>
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+    model = "Buttercorne";
+    compatible = "custom,buttercorne";
+
+    chosen {
+        zephyr,code-partition = &code_partition;
+        zephyr,sram = &sram0;
+        zephyr,flash = &flash0;
+        zmk,kscan = &kscan0;
+        zmk,matrix-transform = &default_transform;
+    };
+
+    /*
+     * Matrix transform for the Buttercorne:
+     *
+     * Rows 0-2: 5 keys per half (10 total per row)
+     * Row 3:    thumb row — only columns 2-7 have physical switches;
+     *           columns 0, 1, 8, 9 are matrix gaps (no switch).
+     *
+     * Logical key order (36 keys total):
+     *   [ Row 0: 10 ] [ Row 1: 10 ] [ Row 2: 10 ] [ Thumb: 6 ]
+     */
+    default_transform: keymap_transform_0 {
+        compatible = "zmk,matrix-transform";
+        columns = <10>;
+        rows = <4>;
+        //  Left half (cols 0-4)              Right half (cols 5-9)
+        map = <
+RC(0,0) RC(0,1) RC(0,2) RC(0,3) RC(0,4)    RC(0,5) RC(0,6) RC(0,7) RC(0,8) RC(0,9)
+RC(1,0) RC(1,1) RC(1,2) RC(1,3) RC(1,4)    RC(1,5) RC(1,6) RC(1,7) RC(1,8) RC(1,9)
+RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4)    RC(2,5) RC(2,6) RC(2,7) RC(2,8) RC(2,9)
+                RC(3,2) RC(3,3) RC(3,4)    RC(3,5) RC(3,6) RC(3,7)
+        >;
+    };
+
+    kscan0: kscan {
+        compatible = "zmk,kscan-gpio-matrix";
+        wakeup-source;
+
+        diode-direction = "col2row";
+
+        row-gpios
+            = <&gpio0  2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0 29 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0  9 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0  4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            ;
+
+        col-gpios
+            = <&gpio1  1 GPIO_ACTIVE_HIGH>
+            , <&gpio0 28 GPIO_ACTIVE_HIGH>
+            , <&gpio0 19 GPIO_ACTIVE_HIGH>
+            , <&gpio0  3 GPIO_ACTIVE_HIGH>
+            , <&gpio0 15 GPIO_ACTIVE_HIGH>
+            , <&gpio0  5 GPIO_ACTIVE_HIGH>
+            , <&gpio1 11 GPIO_ACTIVE_HIGH>
+            , <&gpio1  3 GPIO_ACTIVE_HIGH>
+            , <&gpio1  5 GPIO_ACTIVE_HIGH>
+            , <&gpio1  7 GPIO_ACTIVE_HIGH>
+            ;
+    };
+};
+
+&reg1 {
+    regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
+};
+
+&adc {
+    status = "okay";
+};
+
+&gpiote {
+    status = "okay";
+};
+
+&gpio0 {
+    status = "okay";
+};
+
+&gpio1 {
+    status = "okay";
+};
+
+zephyr_udc0: &usbd {
+    status = "okay";
+};
+
+&flash0 {
+    /*
+     * Buttercorne flash layout:
+     *   0x00000000 - 0x00000FFF  Nordic MBR (4 KB) — sets up interrupt forwarding
+     *   0x00001000 - 0x000EBFFF  ZMK application code  (~940 KB)
+     *   0x000EC000 - 0x000F3FFF  NVS settings storage   (32 KB)
+     *   0x000F4000 - 0x000FFFFF  Adafruit DFU bootloader (48 KB)
+     *
+     * The RMK firmware for this board links at 0x1000 (memory.x: ORIGIN = 0x1000),
+     * confirming the bootloader jumps to 0x1000, NOT 0x26000 as on nice!nano.
+     */
+    partitions {
+        compatible = "fixed-partitions";
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        /* Nordic MBR — reserved, not used by ZMK */
+        sd_partition: partition@0 {
+            reg = <0x00000000 0x00001000>;
+        };
+        code_partition: partition@1000 {
+            reg = <0x00001000 0x000eb000>;
+        };
+        storage_partition: partition@ec000 {
+            reg = <0x000ec000 0x00008000>;
+        };
+        boot_partition: partition@f4000 {
+            reg = <0x000f4000 0x0000c000>;
+        };
+    };
+};

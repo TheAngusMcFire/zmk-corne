@@ -1,0 +1,13 @@
+.zmk/
+
+# West workspace metadata
+.west/
+
+# West-fetched dependencies (not part of this config repo)
+zephyr/
+zmk/
+modules/
+optional/
+
+# Build output
+build/

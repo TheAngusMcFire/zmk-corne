@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+
+# ARM MPU and pinctrl (required by nRF52840 Zephyr SoC driver)
+CONFIG_ARM_MPU=y
+CONFIG_PINCTRL=y
+
+# GPIO
+CONFIG_GPIO=y
+
+# P0.09 (matrix row 2) is an NFC antenna pin on nRF52840. Enable it as GPIO.
+# Equivalent to embassy-nrf's "nfc-pins-as-gpio" feature used by the RMK firmware.
+CONFIG_NFCT_PINS_AS_GPIOS=y
+
+# Place firmware at code_partition (0x26000) for Adafruit bootloader compatibility
+CONFIG_USE_DT_CODE_PARTITION=y
+
+# Generate .uf2 output for drag-and-drop flashing via Adafruit bootloader
+CONFIG_BUILD_OUTPUT_UF2=y
