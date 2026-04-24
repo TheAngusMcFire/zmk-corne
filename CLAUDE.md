@@ -44,13 +44,13 @@ source ~/zmk-dev/.venv/bin/activate
 
 # Left half
 ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb GNUARMEMB_TOOLCHAIN_PATH=/usr \
-  west build -p -b nice_nano --build-dir build/left zmk/app -- \
+  west build -p -b 'nice_nano//zmk' --build-dir build/left zmk/app -- \
     -DSHIELD=corne_left \
     -DZMK_CONFIG="$(pwd)/config"
 
 # Right half
 ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb GNUARMEMB_TOOLCHAIN_PATH=/usr \
-  west build -p -b nice_nano --build-dir build/right zmk/app -- \
+  west build -p -b 'nice_nano//zmk' --build-dir build/right zmk/app -- \
     -DSHIELD=corne_right \
     -DZMK_CONFIG="$(pwd)/config"
 ```
@@ -58,7 +58,7 @@ ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb GNUARMEMB_TOOLCHAIN_PATH=/usr \
 Output `.uf2` files land at `build/left/zephyr/zmk.uf2` and `build/right/zephyr/zmk.uf2`.
 
 Notes:
-- The board name for local builds is `nice_nano` (not `nice_nano_v2` as in `build.yaml`); v2.0.0 is the default revision.
+- Since Zephyr 4.1, the board name requires the `//zmk` variant qualifier (`nice_nano//zmk`). The `//` skips SoC/cpucluster levels to address the variant directly.
 - `-p` (pristine) is required when switching between left/right shields.
 - Omit `-p` for incremental rebuilds after keymap-only edits.
 
